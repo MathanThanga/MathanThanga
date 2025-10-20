@@ -1,0 +1,30 @@
+name: Scheduled Profile Update (API)
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # daily 04:00 UTC — adjust as needed
+  workflow_dispatch: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run update script
+        env:
+          PROFILE_API_URL: ${{ secrets.PROFILE_API_URL }}
+          PROFILE_API_TOKEN: ${{ secrets.PROFILE_API_TOKEN }}
+          NEW_DISPLAY_NAME: ${{ secrets.NEW_DISPLAY_NAME }}
+        run: |
+          python update_profile.py
